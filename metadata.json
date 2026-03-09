@@ -1,0 +1,5 @@
+{
+  "name": "Star Island Volleyball League",
+  "description": "Official information platform for the Star Island Volleyball League (SIVL), featuring schedule, teams, players, and a time simulation engine.",
+  "requestFramePermissions": []
+}
