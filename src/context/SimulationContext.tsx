@@ -67,8 +67,8 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       let changed = false;
       const newMatches = [...prevMatches];
 
-      // Resolve Regular Playoffs on June 1
-      if (currentTime >= new Date('2026-06-01T00:00:00Z')) {
+      // Resolve Regular Playoffs on May 5
+      if (currentTime >= new Date('2026-05-05T00:00:00Z')) {
         const envoStandings = calculateStandings(newMatches, 'EnVO+', 'Regular');
         const netStandings = calculateStandings(newMatches, 'NET', 'Regular');
         
@@ -85,8 +85,8 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
         });
       }
       
-      // Resolve Regular Finals on June 7 (after SF)
-      if (currentTime >= new Date('2026-06-07T00:00:00Z')) {
+      // Resolve Regular Finals on May 10 (after SF)
+      if (currentTime >= new Date('2026-05-10T00:00:00Z')) {
         const envoSF1 = newMatches.find(m => m.name === 'EnVO+ Semi-Final 1');
         const envoSF2 = newMatches.find(m => m.name === 'EnVO+ Semi-Final 2');
         const netSF1 = newMatches.find(m => m.name === 'NET Semi-Final 1');
@@ -104,8 +104,8 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
         });
       }
 
-      // Resolve SIVL Championship on June 14
-      if (currentTime >= new Date('2026-06-14T00:00:00Z')) {
+      // Resolve SIVL Championship on May 17
+      if (currentTime >= new Date('2026-05-17T00:00:00Z')) {
         const envoFinal = newMatches.find(m => m.name === 'EnVO+ Final');
         const netFinal = newMatches.find(m => m.name === 'NET Final');
         newMatches.forEach(m => {

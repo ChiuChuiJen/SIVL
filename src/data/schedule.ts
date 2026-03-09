@@ -251,22 +251,22 @@ const generateSummerSeason = (envoTeams: string[], netTeams: string[], startDate
 const generatePlayoffs = (): Match[] => {
   const matches: Match[] = [];
   
-  // June Playoffs
-  // June 6: SF
-  const june6 = new Date('2026-06-06T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_1', awayTeamId: 'TBD_ENVO_4', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 1', date: new Date(june6.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_2', awayTeamId: 'TBD_ENVO_3', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 2', date: new Date(june6.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_1', awayTeamId: 'TBD_NET_4', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 1', date: new Date(june6.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_2', awayTeamId: 'TBD_NET_3', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 2', date: new Date(june6.setHours(20)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  // May Playoffs
+  // May 9: SF
+  const may9 = new Date('2026-05-09T14:00:00Z');
+  matches.push({ id: '', homeTeamId: 'TBD_ENVO_1', awayTeamId: 'TBD_ENVO_4', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 1', date: new Date(may9.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: 'TBD_ENVO_2', awayTeamId: 'TBD_ENVO_3', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 2', date: new Date(may9.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: 'TBD_NET_1', awayTeamId: 'TBD_NET_4', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 1', date: new Date(may9.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: 'TBD_NET_2', awayTeamId: 'TBD_NET_3', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 2', date: new Date(may9.setHours(20)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
-  // June 13: Finals
-  const june13 = new Date('2026-06-13T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_F1', awayTeamId: 'TBD_ENVO_F2', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Final', date: new Date(june13.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_F1', awayTeamId: 'TBD_NET_F2', branch: 'NET', type: 'Playoff', name: 'NET Final', date: new Date(june13.setHours(19)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  // May 16: Finals
+  const may16 = new Date('2026-05-16T14:00:00Z');
+  matches.push({ id: '', homeTeamId: 'TBD_ENVO_F1', awayTeamId: 'TBD_ENVO_F2', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Final', date: new Date(may16.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: 'TBD_NET_F1', awayTeamId: 'TBD_NET_F2', branch: 'NET', type: 'Playoff', name: 'NET Final', date: new Date(may16.setHours(19)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
-  // June 20: SIVL Championship
-  const june20 = new Date('2026-06-20T18:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_CHAMP_ENVO', awayTeamId: 'TBD_CHAMP_NET', branch: 'Mixed', type: 'Playoff', name: 'SIVL Championship', date: june20, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  // May 23: SIVL Championship
+  const may23 = new Date('2026-05-23T18:00:00Z');
+  matches.push({ id: '', homeTeamId: 'TBD_CHAMP_ENVO', awayTeamId: 'TBD_CHAMP_NET', branch: 'Mixed', type: 'Playoff', name: 'SIVL Championship', date: may23, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // October Summer Playoffs
   // Oct 3: QF

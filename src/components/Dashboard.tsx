@@ -83,22 +83,28 @@ export default function Dashboard() {
             <ListOrdered className="h-5 w-5 text-amber-600" />
             <h2 className="text-lg font-semibold text-slate-800">{t.home.standings}</h2>
           </div>
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => setStandingsType('Regular')}
-              className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${standingsType === 'Regular' ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-slate-100'}`}
-            >
-              {language === 'zh' ? '例行賽' : 'Regular Season'}
+          <div className="flex items-center space-x-4">
+            <button className="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors flex items-center">
+              <Trophy className="h-4 w-4 mr-1" />
+              {language === 'zh' ? '個人獎項' : 'Awards'}
             </button>
-            <button 
-              onClick={() => setStandingsType('Summer')}
-              className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${standingsType === 'Summer' ? 'bg-amber-100 text-amber-700' : 'text-slate-500 hover:bg-slate-100'}`}
-            >
-              <div className="flex items-center space-x-1">
-                <Sun className="h-3 w-3" />
-                <span>{language === 'zh' ? '夏日季賽' : 'Summer Season'}</span>
-              </div>
-            </button>
+            <div className="flex space-x-2 border-l border-slate-200 pl-4">
+              <button 
+                onClick={() => setStandingsType('Regular')}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${standingsType === 'Regular' ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-slate-100'}`}
+              >
+                {language === 'zh' ? '例行賽' : 'Regular Season'}
+              </button>
+              <button 
+                onClick={() => setStandingsType('Summer')}
+                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${standingsType === 'Summer' ? 'bg-amber-100 text-amber-700' : 'text-slate-500 hover:bg-slate-100'}`}
+              >
+                <div className="flex items-center space-x-1">
+                  <Sun className="h-3 w-3" />
+                  <span>{language === 'zh' ? '夏日季賽' : 'Summer Season'}</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
         
@@ -175,40 +181,73 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Results */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden lg:col-span-3 flex flex-col">
-        <div className="px-4 py-4 border-b border-slate-200 bg-slate-50 flex items-center space-x-2">
-          <Activity className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-slate-800">{t.home.recentResults}</h2>
+      {/* Right Column */}
+      <div className="lg:col-span-3 flex flex-col gap-6">
+        {/* Recent Results */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 max-h-[50vh] lg:max-h-none">
+          <div className="px-4 py-4 border-b border-slate-200 bg-slate-50 flex items-center space-x-2 shrink-0">
+            <Activity className="h-5 w-5 text-emerald-600" />
+            <h2 className="text-lg font-semibold text-slate-800">{t.home.recentResults}</h2>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto">
+            {recentResults.length === 0 ? (
+              <p className="text-slate-500 text-center py-4">No recent results.</p>
+            ) : (
+              <div className="space-y-3">
+                {recentResults.map(match => (
+                  <div key={match.id} className="flex flex-col p-3 rounded-lg border border-slate-100 bg-slate-50">
+                    {match.name && (
+                      <div className="text-[10px] font-bold text-indigo-600 mb-1 text-center truncate">{match.name}</div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <div className={`flex-1 text-right text-sm truncate ${match.homeSets > match.awaySets ? 'text-slate-900 font-bold' : 'text-slate-500 font-medium'}`}>
+                        {getTeamName(match.homeTeamId)}
+                      </div>
+                      <div className="px-2 flex flex-col items-center shrink-0">
+                        <span className="font-bold text-base text-slate-800">{match.homeSets} - {match.awaySets}</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">
+                          {match.date.toLocaleDateString(language === 'zh' ? 'zh-TW' : 'en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <div className={`flex-1 text-left text-sm truncate ${match.awaySets > match.homeSets ? 'text-slate-900 font-bold' : 'text-slate-500 font-medium'}`}>
+                        {getTeamName(match.awayTeamId)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="p-4 flex-1 overflow-y-auto">
-          {recentResults.length === 0 ? (
-            <p className="text-slate-500 text-center py-4">No recent results.</p>
-          ) : (
+
+        {/* Individual Awards */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 max-h-[50vh] lg:max-h-none">
+          <div className="px-4 py-4 border-b border-slate-200 bg-slate-50 flex items-center space-x-2 shrink-0">
+            <Trophy className="h-5 w-5 text-amber-500" />
+            <h2 className="text-lg font-semibold text-slate-800">{language === 'zh' ? '個人獎項' : 'Individual Awards'}</h2>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto">
             <div className="space-y-3">
-              {recentResults.map(match => (
-                <div key={match.id} className="flex flex-col p-3 rounded-lg border border-slate-100 bg-slate-50">
-                  {match.name && (
-                    <div className="text-[10px] font-bold text-indigo-600 mb-1 text-center truncate">{match.name}</div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <div className={`flex-1 text-right text-sm truncate ${match.homeSets > match.awaySets ? 'text-slate-900 font-bold' : 'text-slate-500 font-medium'}`}>
-                      {getTeamName(match.homeTeamId)}
-                    </div>
-                    <div className="px-2 flex flex-col items-center shrink-0">
-                      <span className="font-bold text-base text-slate-800">{match.homeSets} - {match.awaySets}</span>
-                      <span className="text-[10px] text-slate-400 mt-0.5">
-                        {match.date.toLocaleDateString(language === 'zh' ? 'zh-TW' : 'en-US', { month: 'short', day: 'numeric' })}
-                      </span>
-                    </div>
-                    <div className={`flex-1 text-left text-sm truncate ${match.awaySets > match.homeSets ? 'text-slate-900 font-bold' : 'text-slate-500 font-medium'}`}>
-                      {getTeamName(match.awayTeamId)}
-                    </div>
+              {[
+                { title: language === 'zh' ? 'MVP' : 'MVP', player: '林柏宇', team: '旭日阿波羅', value: '28.5 pts/g' },
+                { title: language === 'zh' ? '最佳主攻手' : 'Best Spiker', player: '陳建宏', team: '綠葉遊俠', value: '54% atk' },
+                { title: language === 'zh' ? '最佳攔中' : 'Best Blocker', player: '張志豪', team: '巨木泰坦', value: '1.2 blk/s' },
+                { title: language === 'zh' ? '最佳舉球員' : 'Best Setter', player: '王大明', team: '星辰領航者', value: '11.5 ast/s' },
+                { title: language === 'zh' ? '最佳自由球員' : 'Best Libero', player: '李宇軒', team: '碧波海神', value: '68% rec' },
+              ].map((award, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg border border-slate-100 bg-slate-50">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">{award.title}</span>
+                    <span className="text-sm font-bold text-slate-800">{award.player}</span>
+                    <span className="text-[10px] text-slate-500">{award.team}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-mono font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{award.value}</span>
                   </div>
                 </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
