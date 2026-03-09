@@ -20,8 +20,8 @@ export interface Team {
   players: Player[];
 }
 
-const FIRST_NAMES_ZH = ['宇', '辰', '翔', '軒', '傑', '凱', '皓', '哲', '瑋', '柏', '宏', '霖', '翰', '彥', '廷', '睿', '恩', '浩', '鈞', '銘'];
-const LAST_NAMES_ZH = ['陳', '林', '黃', '張', '李', '王', '吳', '劉', '蔡', '楊', '許', '鄭', '謝', '洪', '郭', '邱', '曾', '廖', '賴', '徐'];
+const FIRST_NAMES_ZH = ['宇', '辰', '翔', '軒', '傑', '凱', '皓', '哲', '瑋', '柏', '宏', '霖', '翰', '彥', '廷', '睿', '恩', '浩', '鈞', '銘', '安', '平', '志', '明', '建', '國', '文', '武', '信', '義', '忠', '孝', '仁', '愛', '和', '平', '大', '中', '小', '天', '地', '玄', '黃', '宇', '宙', '洪', '荒', '日', '月', '盈', '昃', '辰', '宿', '列', '張', '寒', '來', '暑', '往', '秋', '收', '冬', '藏'];
+const LAST_NAMES_ZH = ['陳', '林', '黃', '張', '李', '王', '吳', '劉', '蔡', '楊', '許', '鄭', '謝', '洪', '郭', '邱', '曾', '廖', '賴', '徐', '歐陽', '司徒', '諸葛', '上官'];
 const FIRST_NAMES_EN = ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles', 'Christopher', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua'];
 const LAST_NAMES_EN = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'];
 
@@ -31,8 +31,14 @@ const generatePlayers = (teamId: string): Player[] => {
   
   // 6 starters, 6-8 bench. Total 12-14. Let's do 14.
   for (let i = 0; i < 14; i++) {
-    const fnZh = FIRST_NAMES_ZH[Math.floor(Math.random() * FIRST_NAMES_ZH.length)];
     const lnZh = LAST_NAMES_ZH[Math.floor(Math.random() * LAST_NAMES_ZH.length)];
+    const totalLength = Math.floor(Math.random() * 3) + 3; // 3 to 5 characters total
+    const fnLength = Math.max(1, totalLength - lnZh.length); // Ensure at least 1 character for first name
+    
+    let fnZh = '';
+    for (let j = 0; j < fnLength; j++) {
+      fnZh += FIRST_NAMES_ZH[Math.floor(Math.random() * FIRST_NAMES_ZH.length)];
+    }
     const fnEn = FIRST_NAMES_EN[Math.floor(Math.random() * FIRST_NAMES_EN.length)];
     const lnEn = LAST_NAMES_EN[Math.floor(Math.random() * LAST_NAMES_EN.length)];
     

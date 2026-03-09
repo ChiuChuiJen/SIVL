@@ -67,90 +67,93 @@ export const SimulationProvider = ({ children }: { children: ReactNode }) => {
       let changed = false;
       const newMatches = [...prevMatches];
 
+      const currentYear = currentTime.getFullYear();
+      const currentYearMatches = newMatches.filter(m => m.date.getFullYear() === currentYear);
+
       // Resolve Regular Playoffs on May 5
-      if (currentTime >= new Date('2026-05-05T00:00:00Z')) {
-        const envoStandings = calculateStandings(newMatches, 'EnVO+', 'Regular');
-        const netStandings = calculateStandings(newMatches, 'NET', 'Regular');
+      if (currentTime >= new Date(`${currentYear}-05-05T00:00:00Z`)) {
+        const envoStandings = calculateStandings(currentYearMatches, 'EnVO+', 'Regular');
+        const netStandings = calculateStandings(currentYearMatches, 'NET', 'Regular');
         
         newMatches.forEach(m => {
-          if (m.homeTeamId === 'TBD_ENVO_1') { m.homeTeamId = envoStandings[0].id; changed = true; }
-          if (m.awayTeamId === 'TBD_ENVO_4') { m.awayTeamId = envoStandings[3].id; changed = true; }
-          if (m.homeTeamId === 'TBD_ENVO_2') { m.homeTeamId = envoStandings[1].id; changed = true; }
-          if (m.awayTeamId === 'TBD_ENVO_3') { m.awayTeamId = envoStandings[2].id; changed = true; }
+          if (m.homeTeamId === `TBD_ENVO_1_${currentYear}`) { m.homeTeamId = envoStandings[0].id; changed = true; }
+          if (m.awayTeamId === `TBD_ENVO_4_${currentYear}`) { m.awayTeamId = envoStandings[3].id; changed = true; }
+          if (m.homeTeamId === `TBD_ENVO_2_${currentYear}`) { m.homeTeamId = envoStandings[1].id; changed = true; }
+          if (m.awayTeamId === `TBD_ENVO_3_${currentYear}`) { m.awayTeamId = envoStandings[2].id; changed = true; }
           
-          if (m.homeTeamId === 'TBD_NET_1') { m.homeTeamId = netStandings[0].id; changed = true; }
-          if (m.awayTeamId === 'TBD_NET_4') { m.awayTeamId = netStandings[3].id; changed = true; }
-          if (m.homeTeamId === 'TBD_NET_2') { m.homeTeamId = netStandings[1].id; changed = true; }
-          if (m.awayTeamId === 'TBD_NET_3') { m.awayTeamId = netStandings[2].id; changed = true; }
+          if (m.homeTeamId === `TBD_NET_1_${currentYear}`) { m.homeTeamId = netStandings[0].id; changed = true; }
+          if (m.awayTeamId === `TBD_NET_4_${currentYear}`) { m.awayTeamId = netStandings[3].id; changed = true; }
+          if (m.homeTeamId === `TBD_NET_2_${currentYear}`) { m.homeTeamId = netStandings[1].id; changed = true; }
+          if (m.awayTeamId === `TBD_NET_3_${currentYear}`) { m.awayTeamId = netStandings[2].id; changed = true; }
         });
       }
       
       // Resolve Regular Finals on May 10 (after SF)
-      if (currentTime >= new Date('2026-05-10T00:00:00Z')) {
-        const envoSF1 = newMatches.find(m => m.name === 'EnVO+ Semi-Final 1');
-        const envoSF2 = newMatches.find(m => m.name === 'EnVO+ Semi-Final 2');
-        const netSF1 = newMatches.find(m => m.name === 'NET Semi-Final 1');
-        const netSF2 = newMatches.find(m => m.name === 'NET Semi-Final 2');
+      if (currentTime >= new Date(`${currentYear}-05-10T00:00:00Z`)) {
+        const envoSF1 = currentYearMatches.find(m => m.name === 'EnVO+ Semi-Final 1');
+        const envoSF2 = currentYearMatches.find(m => m.name === 'EnVO+ Semi-Final 2');
+        const netSF1 = currentYearMatches.find(m => m.name === 'NET Semi-Final 1');
+        const netSF2 = currentYearMatches.find(m => m.name === 'NET Semi-Final 2');
         
         newMatches.forEach(m => {
-          if (m.name === 'EnVO+ Final') {
-            if (envoSF1?.status === 'finished' && m.homeTeamId === 'TBD_ENVO_F1') { m.homeTeamId = envoSF1.homeSets > envoSF1.awaySets ? envoSF1.homeTeamId : envoSF1.awayTeamId; changed = true; }
-            if (envoSF2?.status === 'finished' && m.awayTeamId === 'TBD_ENVO_F2') { m.awayTeamId = envoSF2.homeSets > envoSF2.awaySets ? envoSF2.homeTeamId : envoSF2.awayTeamId; changed = true; }
+          if (m.name === 'EnVO+ Final' && m.date.getFullYear() === currentYear) {
+            if (envoSF1?.status === 'finished' && m.homeTeamId === `TBD_ENVO_F1_${currentYear}`) { m.homeTeamId = envoSF1.homeSets > envoSF1.awaySets ? envoSF1.homeTeamId : envoSF1.awayTeamId; changed = true; }
+            if (envoSF2?.status === 'finished' && m.awayTeamId === `TBD_ENVO_F2_${currentYear}`) { m.awayTeamId = envoSF2.homeSets > envoSF2.awaySets ? envoSF2.homeTeamId : envoSF2.awayTeamId; changed = true; }
           }
-          if (m.name === 'NET Final') {
-            if (netSF1?.status === 'finished' && m.homeTeamId === 'TBD_NET_F1') { m.homeTeamId = netSF1.homeSets > netSF1.awaySets ? netSF1.homeTeamId : netSF1.awayTeamId; changed = true; }
-            if (netSF2?.status === 'finished' && m.awayTeamId === 'TBD_NET_F2') { m.awayTeamId = netSF2.homeSets > netSF2.awaySets ? netSF2.homeTeamId : netSF2.awayTeamId; changed = true; }
+          if (m.name === 'NET Final' && m.date.getFullYear() === currentYear) {
+            if (netSF1?.status === 'finished' && m.homeTeamId === `TBD_NET_F1_${currentYear}`) { m.homeTeamId = netSF1.homeSets > netSF1.awaySets ? netSF1.homeTeamId : netSF1.awayTeamId; changed = true; }
+            if (netSF2?.status === 'finished' && m.awayTeamId === `TBD_NET_F2_${currentYear}`) { m.awayTeamId = netSF2.homeSets > netSF2.awaySets ? netSF2.homeTeamId : netSF2.awayTeamId; changed = true; }
           }
         });
       }
 
       // Resolve SIVL Championship on May 17
-      if (currentTime >= new Date('2026-05-17T00:00:00Z')) {
-        const envoFinal = newMatches.find(m => m.name === 'EnVO+ Final');
-        const netFinal = newMatches.find(m => m.name === 'NET Final');
+      if (currentTime >= new Date(`${currentYear}-05-17T00:00:00Z`)) {
+        const envoFinal = currentYearMatches.find(m => m.name === 'EnVO+ Final');
+        const netFinal = currentYearMatches.find(m => m.name === 'NET Final');
         newMatches.forEach(m => {
-          if (m.name === 'SIVL Championship') {
-            if (envoFinal?.status === 'finished' && m.homeTeamId === 'TBD_CHAMP_ENVO') { m.homeTeamId = envoFinal.homeSets > envoFinal.awaySets ? envoFinal.homeTeamId : envoFinal.awayTeamId; changed = true; }
-            if (netFinal?.status === 'finished' && m.awayTeamId === 'TBD_CHAMP_NET') { m.awayTeamId = netFinal.homeSets > netFinal.awaySets ? netFinal.homeTeamId : netFinal.awayTeamId; changed = true; }
+          if (m.name === 'SIVL Championship' && m.date.getFullYear() === currentYear) {
+            if (envoFinal?.status === 'finished' && m.homeTeamId === `TBD_CHAMP_ENVO_${currentYear}`) { m.homeTeamId = envoFinal.homeSets > envoFinal.awaySets ? envoFinal.homeTeamId : envoFinal.awayTeamId; changed = true; }
+            if (netFinal?.status === 'finished' && m.awayTeamId === `TBD_CHAMP_NET_${currentYear}`) { m.awayTeamId = netFinal.homeSets > netFinal.awaySets ? netFinal.homeTeamId : netFinal.awayTeamId; changed = true; }
           }
         });
       }
 
       // Resolve Summer Playoffs on Oct 1
-      if (currentTime >= new Date('2026-10-01T00:00:00Z')) {
-        const summerStandings = calculateStandings(newMatches, 'Mixed', 'Summer');
+      if (currentTime >= new Date(`${currentYear}-10-01T00:00:00Z`)) {
+        const summerStandings = calculateStandings(currentYearMatches, 'Mixed', 'Summer');
         newMatches.forEach(m => {
-          if (m.homeTeamId === 'TBD_SUM_3') { m.homeTeamId = summerStandings[2].id; changed = true; }
-          if (m.awayTeamId === 'TBD_SUM_6') { m.awayTeamId = summerStandings[5].id; changed = true; }
-          if (m.homeTeamId === 'TBD_SUM_4') { m.homeTeamId = summerStandings[3].id; changed = true; }
-          if (m.awayTeamId === 'TBD_SUM_5') { m.awayTeamId = summerStandings[4].id; changed = true; }
-          if (m.homeTeamId === 'TBD_SUM_1') { m.homeTeamId = summerStandings[0].id; changed = true; }
-          if (m.homeTeamId === 'TBD_SUM_2') { m.homeTeamId = summerStandings[1].id; changed = true; }
+          if (m.homeTeamId === `TBD_SUM_3_${currentYear}`) { m.homeTeamId = summerStandings[2].id; changed = true; }
+          if (m.awayTeamId === `TBD_SUM_6_${currentYear}`) { m.awayTeamId = summerStandings[5].id; changed = true; }
+          if (m.homeTeamId === `TBD_SUM_4_${currentYear}`) { m.homeTeamId = summerStandings[3].id; changed = true; }
+          if (m.awayTeamId === `TBD_SUM_5_${currentYear}`) { m.awayTeamId = summerStandings[4].id; changed = true; }
+          if (m.homeTeamId === `TBD_SUM_1_${currentYear}`) { m.homeTeamId = summerStandings[0].id; changed = true; }
+          if (m.homeTeamId === `TBD_SUM_2_${currentYear}`) { m.homeTeamId = summerStandings[1].id; changed = true; }
         });
       }
 
       // Resolve Summer SF on Oct 4
-      if (currentTime >= new Date('2026-10-04T00:00:00Z')) {
-        const sumQF1 = newMatches.find(m => m.name === 'Summer Quarter-Final 1');
-        const sumQF2 = newMatches.find(m => m.name === 'Summer Quarter-Final 2');
+      if (currentTime >= new Date(`${currentYear}-10-04T00:00:00Z`)) {
+        const sumQF1 = currentYearMatches.find(m => m.name === 'Summer Quarter-Final 1');
+        const sumQF2 = currentYearMatches.find(m => m.name === 'Summer Quarter-Final 2');
         newMatches.forEach(m => {
-          if (m.name === 'Summer Semi-Final 1' && sumQF1?.status === 'finished' && m.awayTeamId === 'TBD_SUM_QF1') {
+          if (m.name === 'Summer Semi-Final 1' && m.date.getFullYear() === currentYear && sumQF1?.status === 'finished' && m.awayTeamId === `TBD_SUM_QF1_${currentYear}`) {
              m.awayTeamId = sumQF1.homeSets > sumQF1.awaySets ? sumQF1.homeTeamId : sumQF1.awayTeamId; changed = true;
           }
-          if (m.name === 'Summer Semi-Final 2' && sumQF2?.status === 'finished' && m.awayTeamId === 'TBD_SUM_QF2') {
+          if (m.name === 'Summer Semi-Final 2' && m.date.getFullYear() === currentYear && sumQF2?.status === 'finished' && m.awayTeamId === `TBD_SUM_QF2_${currentYear}`) {
              m.awayTeamId = sumQF2.homeSets > sumQF2.awaySets ? sumQF2.homeTeamId : sumQF2.awayTeamId; changed = true;
           }
         });
       }
 
       // Resolve Summer Final on Oct 11
-      if (currentTime >= new Date('2026-10-11T00:00:00Z')) {
-        const sumSF1 = newMatches.find(m => m.name === 'Summer Semi-Final 1');
-        const sumSF2 = newMatches.find(m => m.name === 'Summer Semi-Final 2');
+      if (currentTime >= new Date(`${currentYear}-10-11T00:00:00Z`)) {
+        const sumSF1 = currentYearMatches.find(m => m.name === 'Summer Semi-Final 1');
+        const sumSF2 = currentYearMatches.find(m => m.name === 'Summer Semi-Final 2');
         newMatches.forEach(m => {
-          if (m.name === 'Summer Championship') {
-            if (sumSF1?.status === 'finished' && m.homeTeamId === 'TBD_SUM_F1') { m.homeTeamId = sumSF1.homeSets > sumSF1.awaySets ? sumSF1.homeTeamId : sumSF1.awayTeamId; changed = true; }
-            if (sumSF2?.status === 'finished' && m.awayTeamId === 'TBD_SUM_F2') { m.awayTeamId = sumSF2.homeSets > sumSF2.awaySets ? sumSF2.homeTeamId : sumSF2.awayTeamId; changed = true; }
+          if (m.name === 'Summer Championship' && m.date.getFullYear() === currentYear) {
+            if (sumSF1?.status === 'finished' && m.homeTeamId === `TBD_SUM_F1_${currentYear}`) { m.homeTeamId = sumSF1.homeSets > sumSF1.awaySets ? sumSF1.homeTeamId : sumSF1.awayTeamId; changed = true; }
+            if (sumSF2?.status === 'finished' && m.awayTeamId === `TBD_SUM_F2_${currentYear}`) { m.awayTeamId = sumSF2.homeSets > sumSF2.awaySets ? sumSF2.homeTeamId : sumSF2.awayTeamId; changed = true; }
           }
         });
       }

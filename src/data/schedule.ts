@@ -154,59 +154,68 @@ const getNextFriday = (date: Date) => {
   return d;
 };
 
+const generateRoundRobin = (teams: string[]): [string, string][] => {
+  const matches: [string, string][] = [];
+  const n = teams.length;
+  const dummy = n % 2 !== 0 ? 'BYE' : null;
+  const teamsWithBye = dummy ? [...teams, dummy] : [...teams];
+  const numTeams = teamsWithBye.length;
+
+  for (let round = 0; round < numTeams - 1; round++) {
+    for (let i = 0; i < numTeams / 2; i++) {
+      const home = teamsWithBye[i];
+      const away = teamsWithBye[numTeams - 1 - i];
+      if (home !== 'BYE' && away !== 'BYE') {
+        matches.push([home, away]);
+      }
+    }
+    // Rotate
+    teamsWithBye.splice(1, 0, teamsWithBye.pop()!);
+  }
+  return matches;
+};
+
 const generateRegularSeason = (teams: string[], startDate: Date, branch: 'EnVO+' | 'NET'): Match[] => {
   const matches: Match[] = [];
   let currentWeekStart = getFirstTuesday(startDate);
   
-  const teamMap: Record<string, string> = {
-    'A': teams[0], 'B': teams[1], 'C': teams[2],
-    'D': teams[3], 'E': teams[4], 'F': teams[5],
-    'G': teams[6], 'H': teams[7], 'I': teams[8]
-  };
+  const singleRR = generateRoundRobin(teams);
+  const doubleRR = [...singleRR, ...singleRR.map(m => [m[1], m[0]] as [string, string])];
+  
+  const SLOTS = [
+    { day: 0, hour: 18 }, // Tue
+    { day: 0, hour: 20 },
+    { day: 1, hour: 18 }, // Wed
+    { day: 1, hour: 20 },
+    { day: 3, hour: 18 }, // Fri
+    { day: 3, hour: 20 },
+    { day: 4, hour: 14 }, // Sat
+    { day: 4, hour: 16 },
+    { day: 4, hour: 18 },
+    { day: 5, hour: 14 }, // Sun
+    { day: 5, hour: 16 },
+    { day: 5, hour: 18 },
+  ];
 
-  const dayOffsets: Record<string, number> = {
-    'Tue': 0, 'Wed': 1, 'Fri': 3, 'Sat': 4, 'Sun': 5
-  };
+  doubleRR.forEach((matchPair, index) => {
+    const weekIndex = Math.floor(index / 12);
+    const slotIndex = index % 12;
+    const slot = SLOTS[slotIndex];
+    
+    const specificDate = new Date(currentWeekStart);
+    specificDate.setDate(specificDate.getDate() + (weekIndex * 7) + slot.day);
+    specificDate.setHours(slot.hour, 0, 0, 0);
 
-  const getHours = (day: string, index: number, total: number) => {
-    if (day === 'Tue' || day === 'Fri') {
-      return total === 3 ? [16, 18, 20][index] : [18, 20][index];
-    }
-    if (day === 'Wed') {
-      return [18, 20][index];
-    }
-    if (day === 'Sat' || day === 'Sun') {
-      return total === 3 ? [14, 16, 18][index] : [14, 16][index];
-    }
-    return 18;
-  };
-
-  REGULAR_SCHEDULE_TEMPLATE.forEach((week) => {
-    Object.entries(week).forEach(([day, dayMatches]) => {
-      const offset = dayOffsets[day];
-      const matchDate = new Date(currentWeekStart);
-      matchDate.setDate(matchDate.getDate() + offset);
-      
-      dayMatches.forEach((matchPair, index) => {
-        const home = teamMap[matchPair[0]];
-        const away = teamMap[matchPair[1]];
-        
-        const specificDate = new Date(matchDate);
-        specificDate.setHours(getHours(day, index, dayMatches.length), 0, 0, 0);
-
-        matches.push({
-          id: '',
-          homeTeamId: home,
-          awayTeamId: away,
-          branch,
-          type: 'Regular',
-          date: specificDate,
-          status: 'scheduled',
-          homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: []
-        });
-      });
+    matches.push({
+      id: '',
+      homeTeamId: matchPair[0],
+      awayTeamId: matchPair[1],
+      branch,
+      type: 'Regular',
+      date: specificDate,
+      status: 'scheduled',
+      homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: []
     });
-    currentWeekStart.setDate(currentWeekStart.getDate() + 7); // Next week
   });
 
   return matches;
@@ -248,40 +257,40 @@ const generateSummerSeason = (envoTeams: string[], netTeams: string[], startDate
   return matches;
 };
 
-const generatePlayoffs = (): Match[] => {
+const generatePlayoffs = (year: number): Match[] => {
   const matches: Match[] = [];
   
   // May Playoffs
   // May 9: SF
-  const may9 = new Date('2026-05-09T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_1', awayTeamId: 'TBD_ENVO_4', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 1', date: new Date(may9.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_2', awayTeamId: 'TBD_ENVO_3', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 2', date: new Date(may9.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_1', awayTeamId: 'TBD_NET_4', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 1', date: new Date(may9.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_2', awayTeamId: 'TBD_NET_3', branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 2', date: new Date(may9.setHours(20)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const may9 = new Date(`${year}-05-09T14:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_ENVO_1_${year}`, awayTeamId: `TBD_ENVO_4_${year}`, branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 1', date: new Date(may9.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_ENVO_2_${year}`, awayTeamId: `TBD_ENVO_3_${year}`, branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Semi-Final 2', date: new Date(may9.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_NET_1_${year}`, awayTeamId: `TBD_NET_4_${year}`, branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 1', date: new Date(may9.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_NET_2_${year}`, awayTeamId: `TBD_NET_3_${year}`, branch: 'NET', type: 'Playoff', name: 'NET Semi-Final 2', date: new Date(may9.setHours(20)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // May 16: Finals
-  const may16 = new Date('2026-05-16T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_ENVO_F1', awayTeamId: 'TBD_ENVO_F2', branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Final', date: new Date(may16.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_NET_F1', awayTeamId: 'TBD_NET_F2', branch: 'NET', type: 'Playoff', name: 'NET Final', date: new Date(may16.setHours(19)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const may16 = new Date(`${year}-05-16T14:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_ENVO_F1_${year}`, awayTeamId: `TBD_ENVO_F2_${year}`, branch: 'EnVO+', type: 'Playoff', name: 'EnVO+ Final', date: new Date(may16.setHours(16)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_NET_F1_${year}`, awayTeamId: `TBD_NET_F2_${year}`, branch: 'NET', type: 'Playoff', name: 'NET Final', date: new Date(may16.setHours(19)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // May 23: SIVL Championship
-  const may23 = new Date('2026-05-23T18:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_CHAMP_ENVO', awayTeamId: 'TBD_CHAMP_NET', branch: 'Mixed', type: 'Playoff', name: 'SIVL Championship', date: may23, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const may23 = new Date(`${year}-05-23T18:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_CHAMP_ENVO_${year}`, awayTeamId: `TBD_CHAMP_NET_${year}`, branch: 'Mixed', type: 'Playoff', name: 'SIVL Championship', date: may23, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // October Summer Playoffs
   // Oct 3: QF
-  const oct3 = new Date('2026-10-03T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_SUM_3', awayTeamId: 'TBD_SUM_6', branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Quarter-Final 1', date: new Date(oct3.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_SUM_4', awayTeamId: 'TBD_SUM_5', branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Quarter-Final 2', date: new Date(oct3.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const oct3 = new Date(`${year}-10-03T14:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_SUM_3_${year}`, awayTeamId: `TBD_SUM_6_${year}`, branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Quarter-Final 1', date: new Date(oct3.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_SUM_4_${year}`, awayTeamId: `TBD_SUM_5_${year}`, branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Quarter-Final 2', date: new Date(oct3.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // Oct 10: SF
-  const oct10 = new Date('2026-10-10T14:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_SUM_1', awayTeamId: 'TBD_SUM_QF1', branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Semi-Final 1', date: new Date(oct10.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
-  matches.push({ id: '', homeTeamId: 'TBD_SUM_2', awayTeamId: 'TBD_SUM_QF2', branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Semi-Final 2', date: new Date(oct10.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const oct10 = new Date(`${year}-10-10T14:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_SUM_1_${year}`, awayTeamId: `TBD_SUM_QF1_${year}`, branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Semi-Final 1', date: new Date(oct10.setHours(14)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  matches.push({ id: '', homeTeamId: `TBD_SUM_2_${year}`, awayTeamId: `TBD_SUM_QF2_${year}`, branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Semi-Final 2', date: new Date(oct10.setHours(18)), status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   // Oct 17: Final
-  const oct17 = new Date('2026-10-17T18:00:00Z');
-  matches.push({ id: '', homeTeamId: 'TBD_SUM_F1', awayTeamId: 'TBD_SUM_F2', branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Championship', date: oct17, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
+  const oct17 = new Date(`${year}-10-17T18:00:00Z`);
+  matches.push({ id: '', homeTeamId: `TBD_SUM_F1_${year}`, awayTeamId: `TBD_SUM_F2_${year}`, branch: 'Mixed', type: 'SummerPlayoff', name: 'Summer Championship', date: oct17, status: 'scheduled', homeScore: 0, awayScore: 0, homeSets: 0, awaySets: 0, setScores: [], logs: [] });
 
   return matches;
 };
@@ -290,24 +299,29 @@ export const generateSchedule = (): Match[] => {
   const envoTeams = TEAMS.filter(t => t.branch === 'EnVO+').map(t => t.id);
   const netTeams = TEAMS.filter(t => t.branch === 'NET').map(t => t.id);
 
-  const regStartDate = new Date('2026-01-01T00:00:00Z');
-  const envoMatches = generateRegularSeason(envoTeams, regStartDate, 'EnVO+');
-  const netMatches = generateRegularSeason(netTeams, regStartDate, 'NET');
+  const allMatches: Match[] = [];
 
-  const sumStartDate = new Date('2026-08-01T00:00:00Z');
-  const summerMatches = generateSummerSeason(
-    envoTeams, 
-    netTeams, 
-    sumStartDate
-  );
+  for (let year = 2026; year <= 2030; year++) {
+    const regStartDate = new Date(`${year}-01-01T00:00:00Z`);
+    const envoMatches = generateRegularSeason(envoTeams, regStartDate, 'EnVO+');
+    const netMatches = generateRegularSeason(netTeams, regStartDate, 'NET');
 
-  const playoffMatches = generatePlayoffs();
+    const sumStartDate = new Date(`${year}-08-01T00:00:00Z`);
+    const summerMatches = generateSummerSeason(
+      envoTeams, 
+      netTeams, 
+      sumStartDate
+    );
 
-  const allMatches = [...envoMatches, ...netMatches, ...summerMatches, ...playoffMatches]
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+    const playoffMatches = generatePlayoffs(year);
+
+    allMatches.push(...envoMatches, ...netMatches, ...summerMatches, ...playoffMatches);
+  }
+
+  allMatches.sort((a, b) => a.date.getTime() - b.date.getTime());
   
   // Re-assign IDs to be sequential by date
-  return allMatches.map((m, index) => ({ ...m, id: `M${(index + 1).toString().padStart(3, '0')}` }));
+  return allMatches.map((m, index) => ({ ...m, id: `M${(index + 1).toString().padStart(4, '0')}` }));
 };
 
 export const INITIAL_SCHEDULE = generateSchedule();

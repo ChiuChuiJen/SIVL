@@ -44,7 +44,7 @@ const MainLayout = () => {
               <Trophy className="h-8 w-8 text-yellow-400" />
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold tracking-tight">{t.leagueName}</h1>
-                <span className="text-[10px] text-indigo-300 font-mono">v1.0.0</span>
+                <span className="text-[10px] text-indigo-300 font-mono">v1.1.0</span>
               </div>
             </div>
             
